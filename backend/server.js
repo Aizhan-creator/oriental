@@ -1,21 +1,36 @@
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const db = require('./db');
-const app = express();
+const uri = "mongodb+srv://adminka:Aizhan2003*@cluster0.tlqalo4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(cors());
-
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
 });
 
-const authRoutes = require('./routes/authRoutes');
-app.use('/api/auth', authRoutes);
+async function run() {
+  try {
+    await client.connect();
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+  } finally {
+    await client.close();
+  }
+}
 
-const moderatorRoutes = require('./routes/moderatorRoutes');
-app.use('/api/moderator', moderatorRoutes);
+run().catch(console.dir);
+
+const express = require('express');
+const app = express();
+const port = 3000;
+
+app.get('/', (req, res) => {
+  res.send('Server is working!');
+});
+
+
+app.listen(port, () => {
+  console.log(`Server is listening at http://localhost:${port}`);
+});
